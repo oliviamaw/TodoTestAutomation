@@ -9,12 +9,13 @@ class TodoTest(unittest.TestCase):
 	def setUpClass(cls):
 		# create instance of Firefox driver
 		cls.driver = webdriver.Firefox()
+		self.base_url = "http://todomvc.com/examples/react/"
+		#self.base_url = "http://todomvc.com/examples/angularjs"
  		 	
 	def setUp(self):
 		#wait for firefox to open, set url, load and clear the cache
 		self.driver.implicitly_wait(30)
-		#self.base_url = "http://todomvc.com/examples/react/"
-		self.base_url = "http://todomvc.com/examples/angularjs"
+		#clear the local storage
 		self.driver.get('javascript:localStorage.clear();')
 		
 	#Testing add function by add a value to the field and press enter.
@@ -257,8 +258,8 @@ class TodoTest(unittest.TestCase):
 		##assert all listitem unchecked and list items length is 2	
 		self.assertEqual(len(driver.find_elements_by_css_selector(".view")),2)
  		
-	#Testing completed button function by add 3 items to the list, check 1 of them and click completed
-	#Assert true if: list length is 1
+	#Testing completed button function by add 3 items to the list, check 1 of them and click active
+	#Assert true if: list length is 2
 	def test_completed(self):
 		##arrange: get the web, add some list, check second item
 		driver=self.driver
@@ -284,7 +285,7 @@ class TodoTest(unittest.TestCase):
 		##assert list items length is 1	
 		self.assertEqual(len(driver.find_elements_by_css_selector(".view")),1)
  		
-	#Testing all button function by add 3 items to the list, check 1 of them and click all
+	#Testing all button function by add 3 items to the list, check 1 of them and click active
 	#Assert true if: all list displayed (3 list)
 	def test_all(self):
 		##arrange: get the web page, add list, check second item
@@ -311,7 +312,7 @@ class TodoTest(unittest.TestCase):
 		##assert: active list length is 3	
 		self.assertEqual(len(driver.find_elements_by_css_selector(".view")),3)
  		
-	#Testing clearcompleted button function by add 3 items to the list, check 2 of them and press clear completed
+	#Testing clearcompleted button function by add 3 items to the list, check 1 of them and click active
 	#Assert true if:
 	#-list length is 1
 	#todo count updated	
