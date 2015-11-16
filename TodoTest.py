@@ -7,7 +7,7 @@ class TodoTest(unittest.TestCase):
 
 	@classmethod
 	def setUpClass(cls):
-		###create instance of Firefox driver
+		# create instance of Firefox driver
 		cls.driver = webdriver.Firefox()
  		 	
 	def setUp(self):
@@ -25,7 +25,7 @@ class TodoTest(unittest.TestCase):
 	#Testing edit function by add a value to the field, double click inserted field and edit the value.
 	#Assert true if: list updated
 	def test_delete(self):
-		##arrange:
+		##arrange: get the web page, insert list to delete
 		driver=self.driver
 		driver.get(self.base_url)
 		
@@ -35,16 +35,17 @@ class TodoTest(unittest.TestCase):
 		inputElement.send_keys(Keys.RETURN)
 		inputElement.send_keys('List delete 2')
 		inputElement.send_keys(Keys.RETURN)			
-		#select button delete with class destroy
-		listTodo = driver.find_elements_by_css_selector(".view label")[0]
 		
 		##act: element is not visible if we don't hover to the text
-		#creat an action to hover into it
+		#select button delete with class destroy
 		deleteButton = driver.find_elements_by_css_selector(".destroy")[0]
+		listTodo = driver.find_elements_by_css_selector(".view label")[0]
+		#creat an action to hover into it
 		ActionChains(driver).move_to_element(listTodo).click(deleteButton).perform()
 
 		##assert: check todolist lenght after delete
 		self.assertEqual(len(driver.find_elements_by_css_selector(".view")),1)
+		
 		#check added item information
 		self.assertEqual(driver.find_elements_by_css_selector("footer span strong")[0].text,'1')
 	
@@ -61,12 +62,15 @@ class TodoTest(unittest.TestCase):
 		# press enter
 		inputElement.send_keys(Keys.RETURN)
 		
+		listItem = driver.find_elements_by_class_name("view")
 		##assert: 
-		if driver.find_elements_by_class_name("view"):
+		if listItem:
 			#check input text
-			self.assertEqual(driver.find_elements_by_class_name("view")[0].text,'List todo')
+			self.assertEqual(listItem[0].text,'List todo')
+			
 			#check list count
-			self.assertEqual(len(driver.find_elements_by_css_selector(".view")),1)
+			self.assertEqual(len(listItem),1)
+			
 			#check added item information
 			self.assertEqual(driver.find_elements_by_css_selector("footer span strong")[0].text,'1')
 		else:
@@ -75,21 +79,22 @@ class TodoTest(unittest.TestCase):
 	#Testing edit function by add a value to the field, double click inserted field and edit the value.
 	#Assert true if: list updated	
 	def test_edit(self):
-		##arrange:
+		##arrange: get the web page, add an item
 		driver=self.driver
 		driver.get(self.base_url)
+		
 		#insert todo list to edit
 		inputElement = driver.find_elements_by_xpath("//input[@placeholder='What needs to be done?']")[0]
 		inputElement.send_keys('List Todo')
 		inputElement.send_keys(Keys.RETURN)
-		#get the first list
-		listTodo = driver.find_elements_by_css_selector(".view label")[0]
-		#find element to edit
 		
-		##act:get edited todo list item
-		editedLabel = driver.find_elements_by_css_selector(".edit")[0]
+		##act:get edited todo list item		
 		#double click the todo list item
+		listTodo = driver.find_elements_by_css_selector(".view label")[0]
 		ActionChains(driver).move_to_element(listTodo).double_click(listTodo).perform()
+		
+		#find element label to edit
+		editedLabel = driver.find_elements_by_css_selector(".edit")[0]
 		#clear and insert new value
 		editedLabel.clear()
 		editedLabel.send_keys('List Todo Edited')
@@ -97,6 +102,7 @@ class TodoTest(unittest.TestCase):
 		
 		##assert: if first todo list equals edited value
 		self.assertEqual(listTodo.text,'List Todo Edited')
+		
 		##act: element is not visible if we don't hover to the text
 		#creat an action to hover into it
 		deleteButton = driver.find_elements_by_css_selector(".destroy")[0]
@@ -107,26 +113,27 @@ class TodoTest(unittest.TestCase):
 	#- List item not selected
 	#- Todo count updated (1 item left)
 	def test_uncheckTodo(self):
-		##arrange:
+		##arrange: get the web page, add a list
 		driver=self.driver
 		driver.get(self.base_url)
+		
 		#input element and checkit
 		inputElement = driver.find_elements_by_xpath("//input[@placeholder='What needs to be done?']")[0]
 		inputElement.send_keys('List Todo')
 		inputElement.send_keys(Keys.RETURN)
-		checkBox = driver.find_elements_by_xpath("//input[@type='checkbox']")[1]
-		ActionChains(driver).move_to_element(checkBox).click(checkBox).perform()
+		checkBox = driver.find_elements_by_xpath("//input[@type='checkbox']")
+		ActionChains(driver).move_to_element(checkBox[1]).click(checkBox[1]).perform()
+		
 		#get the first list
 		listTodo = driver.find_elements_by_css_selector(".view")[0]
 		
-		##act: get the checkbox
-		checkBox = driver.find_elements_by_xpath("//input[@type='checkbox']")[1]
-		#click the checkbox
-		ActionChains(driver).move_to_element(checkBox).click(checkBox).perform()
-		checked = checkBox.is_selected()
+		##act: click the checkbox
+		ActionChains(driver).move_to_element(checkBox[1]).click(checkBox[1]).perform()
+		checked = checkBox[1].is_selected()
 		
 		##assert: checkbox unselected
 		self.assertFalse(checked)
+		
 		#check todolist item information
 		self.assertEqual(driver.find_elements_by_css_selector("footer span strong")[0].text,'1')
 	
@@ -135,9 +142,10 @@ class TodoTest(unittest.TestCase):
 	#- List item checked
 	#- Todo count updated (1 item left)
 	def test_checkTodo(self):
-		##arrange:
+		##arrange: get the web page, add some list
 		driver=self.driver
 		driver.get(self.base_url)
+		
 		#input an element to check
 		inputElement = driver.find_elements_by_xpath("//input[@placeholder='What needs to be done?']")[0]
 		inputElement.send_keys('List Todo')
@@ -145,22 +153,24 @@ class TodoTest(unittest.TestCase):
 		inputElement.send_keys('List Todo 2')
 		inputElement.send_keys(Keys.RETURN)			
 		
-		##act: get the checkbox
+		##act: check the checkbox
 		checkBox = driver.find_elements_by_xpath("//input[@type='checkbox']")[2]
-		#click the checkbox
 		ActionChains(driver).move_to_element(checkBox).click(checkBox).perform()
 		checked = checkBox.is_selected()
+		
 		##assert: checkbox value checked
 		self.assertTrue(checked)	
+		
 		#check added item information
 		self.assertEqual(driver.find_elements_by_css_selector("footer span strong")[0].text,'1')
 	
 	#Testing checkall function by add 2 item to the list, click checkall
 	#Assert true if: all list checked
 	def test_checkall(self):		
-		##arrange:
+		##arrange: get the web page, add some list
 		driver=self.driver
 		driver.get(self.base_url)
+		
 		#add some list		
 		inputElement = driver.find_elements_by_xpath("//input[@placeholder='What needs to be done?']")[0]
 		inputElement.send_keys('Item Todo')
@@ -184,15 +194,17 @@ class TodoTest(unittest.TestCase):
 	#- List item not selected
 	#- Todo count updated (2 items left)
 	def test_uncheckall(self):		
-		##arrange:
+		##arrange: get the web page, add some list, check all checkbox
 		driver=self.driver
 		driver.get(self.base_url)
+		
 		#add some list		
 		inputElement = driver.find_elements_by_xpath("//input[@placeholder='What needs to be done?']")[0]
 		inputElement.send_keys('Item Todo')
 		inputElement.send_keys(Keys.RETURN)		
 		inputElement.send_keys('Item Todo 2')
 		inputElement.send_keys(Keys.RETURN)
+		
 		#check all checkbox		
 		listTodoCheckbox = driver.find_elements_by_xpath("//input[@type='checkbox']")
 		ActionChains(driver).move_to_element(listTodoCheckbox[0]).click(listTodoCheckbox[0]).perform()
@@ -205,6 +217,7 @@ class TodoTest(unittest.TestCase):
 		for item in listTodoCheckbox:
 			checked = checked & item.is_selected()
 		self.assertFalse(checked)
+		
 		#check todolist item information
 		self.assertEqual(driver.find_elements_by_css_selector("footer span strong")[0].text,'2')
  		
@@ -213,9 +226,10 @@ class TodoTest(unittest.TestCase):
 	#- list length is 2
 	#- all checkbox in list length is unchecked
 	def test_active(self):
-		##arrange:
+		##arrange: get the web page, add some list, check second list
 		driver=self.driver
 		driver.get(self.base_url)
+		
 		#add some list		
 		inputElement = driver.find_elements_by_xpath("//input[@placeholder='What needs to be done?']")[0]
 		inputElement.send_keys('Item Todo')
@@ -224,30 +238,32 @@ class TodoTest(unittest.TestCase):
 		inputElement.send_keys(Keys.RETURN)		
 		inputElement.send_keys('Item Todo 3')
 		inputElement.send_keys(Keys.RETURN)
+		
 		#check second list		
 		checkBox = driver.find_elements_by_xpath("//input[@type='checkbox']")[2]
-		#click the checkbox
 		ActionChains(driver).move_to_element(checkBox).click(checkBox).perform()
 		
 		##act: click active
 		activeLink = driver.find_element_by_link_text('Active')
 		ActionChains(driver).move_to_element(activeLink).click(activeLink).perform()
 		
+		#check for each checkbox
 		listTodoCheckbox = driver.find_elements_by_xpath("//input[@type='checkbox']")
 		checked = True
 		for item in listTodoCheckbox:
 			checked = checked & item.is_selected()
+		self.assertFalse(checked)
 			
 		##assert all listitem unchecked and list items length is 2	
 		self.assertEqual(len(driver.find_elements_by_css_selector(".view")),2)
-		self.assertFalse(checked)
  		
 	#Testing completed button function by add 3 items to the list, check 1 of them and click active
 	#Assert true if: list length is 2
 	def test_completed(self):
-		##arrange:
+		##arrange: get the web, add some list, check second item
 		driver=self.driver
 		driver.get(self.base_url)
+		
 		#add some list		
 		inputElement = driver.find_elements_by_xpath("//input[@placeholder='What needs to be done?']")[0]
 		inputElement.send_keys('Item Todo')
@@ -256,9 +272,9 @@ class TodoTest(unittest.TestCase):
 		inputElement.send_keys(Keys.RETURN)		
 		inputElement.send_keys('Item Todo 3')
 		inputElement.send_keys(Keys.RETURN)
+		
 		#check second list		
 		checkBox = driver.find_elements_by_xpath("//input[@type='checkbox']")[2]
-		#click the checkbox
 		ActionChains(driver).move_to_element(checkBox).click(checkBox).perform()
 		
 		##act: click active
@@ -271,9 +287,10 @@ class TodoTest(unittest.TestCase):
 	#Testing all button function by add 3 items to the list, check 1 of them and click active
 	#Assert true if: all list displayed (3 list)
 	def test_all(self):
-		##arrange:
+		##arrange: get the web page, add list, check second item
 		driver=self.driver
 		driver.get(self.base_url)
+		
 		#add some list		
 		inputElement = driver.find_elements_by_xpath("//input[@placeholder='What needs to be done?']")[0]
 		inputElement.send_keys('Item Todo')
@@ -282,9 +299,9 @@ class TodoTest(unittest.TestCase):
 		inputElement.send_keys(Keys.RETURN)		
 		inputElement.send_keys('Item Todo 3')
 		inputElement.send_keys(Keys.RETURN)
+		
 		#check second list		
 		checkBox = driver.find_elements_by_xpath("//input[@type='checkbox']")[2]
-		#click the checkbox
 		ActionChains(driver).move_to_element(checkBox).click(checkBox).perform()
 		
 		##act: click active
@@ -299,9 +316,10 @@ class TodoTest(unittest.TestCase):
 	#-list length is 1
 	#todo count updated	
 	def test_clearCompleted(self):
-		##arrange:
+		##arrange: get the web page, add list and check some checkbox
 		driver=self.driver
 		driver.get(self.base_url)
+		
 		#add some list		
 		inputElement = driver.find_elements_by_xpath("//input[@placeholder='What needs to be done?']")[0]
 		inputElement.send_keys('Item Todo')
@@ -310,12 +328,11 @@ class TodoTest(unittest.TestCase):
 		inputElement.send_keys(Keys.RETURN)	
 		inputElement.send_keys('Item Todo 3')
 		inputElement.send_keys(Keys.RETURN)
+		
 		#check all checkbox		
-		checkBox1 = driver.find_elements_by_xpath("//input[@type='checkbox']")[1]
-		ActionChains(driver).move_to_element(checkBox1).click(checkBox1).perform()
-		checkBox3 = driver.find_elements_by_xpath("//input[@type='checkbox']")[3]
-		ActionChains(driver).move_to_element(checkBox3).click(checkBox3).perform()
-		driver.implicitly_wait(10)
+		checkBox = driver.find_elements_by_xpath("//input[@type='checkbox']")
+		ActionChains(driver).move_to_element(checkBox[1]).click(checkBox[1]).perform()
+		ActionChains(driver).move_to_element(checkBox[3]).click(checkBox[3]).perform()
 		
 		##act: get the element anc clickit
 		clearLink = driver.find_element_by_xpath("//button[contains(text(),'Clear')]")
@@ -330,14 +347,5 @@ class TodoTest(unittest.TestCase):
 	def tearDownClass(cls):
 		cls.driver.quit()
 	
-	#def suite():
-	#	suite = unittest.TestSuite()  
-	#	suite.addTest(TodoTest("http://todomvc.com/examples/react/"))  
-	#	suite.addTest(TodoTest("http://todomvc.com/examples/angular/"))  
-	#	return suite  
-
 if __name__ == "__main__":
-	#suite = unittest.TestLoader().loadTestsFromTestCase(TodoTest)
-	#unittest.TextTestRunner(verbosity=2).run(suite)
-	unittest.main()
-	#unittest.TextTestRunner().run(suite()) 
+	unittest.main() 
