@@ -7,7 +7,7 @@ class TodoTest(unittest.TestCase):
 
 	@classmethod
 	def setUpClass(cls):
-		# create instance of Firefox driver
+		###create instance of Firefox driver
 		cls.driver = webdriver.Firefox()
  		 	
 	def setUp(self):
