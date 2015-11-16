@@ -257,8 +257,8 @@ class TodoTest(unittest.TestCase):
 		##assert all listitem unchecked and list items length is 2	
 		self.assertEqual(len(driver.find_elements_by_css_selector(".view")),2)
  		
-	#Testing completed button function by add 3 items to the list, check 1 of them and click active
-	#Assert true if: list length is 2
+	#Testing completed button function by add 3 items to the list, check 1 of them and click completed
+	#Assert true if: list length is 1
 	def test_completed(self):
 		##arrange: get the web, add some list, check second item
 		driver=self.driver
@@ -284,7 +284,7 @@ class TodoTest(unittest.TestCase):
 		##assert list items length is 1	
 		self.assertEqual(len(driver.find_elements_by_css_selector(".view")),1)
  		
-	#Testing all button function by add 3 items to the list, check 1 of them and click active
+	#Testing all button function by add 3 items to the list, check 1 of them and click all
 	#Assert true if: all list displayed (3 list)
 	def test_all(self):
 		##arrange: get the web page, add list, check second item
@@ -311,7 +311,7 @@ class TodoTest(unittest.TestCase):
 		##assert: active list length is 3	
 		self.assertEqual(len(driver.find_elements_by_css_selector(".view")),3)
  		
-	#Testing clearcompleted button function by add 3 items to the list, check 1 of them and click active
+	#Testing clearcompleted button function by add 3 items to the list, check 2 of them and press clear completed
 	#Assert true if:
 	#-list length is 1
 	#todo count updated	
